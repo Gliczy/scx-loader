@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "crates/scx_loader",
+    "crates/scxctl",
+]
+resolver = "2"
