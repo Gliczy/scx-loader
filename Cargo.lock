@@ -1450,7 +1450,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.61.2",
+ "windows-core",
 ]
 
 [[package]]
@@ -1626,9 +1626,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.174"
+version = "0.2.175"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1171693293099992e19cddea4e8b849964e9846f4acee11b3948bcc337be8776"
+checksum = "6a82ae493e598baaea5209805c49bbf2ea7de956d50d7da0da1164f9c6d28543"
 
 [[package]]
 name = "libloading"
@@ -2534,9 +2534,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.11.1"
+version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b544ef1b4eac5dc2db33ea63606ae9ffcfac26c1416a2806ae0bf5f56b201191"
+checksum = "23d7fd106d8c02486a8d64e778353d1cffe08ce79ac2e82f540c86d0facf6912"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -2566,6 +2566,15 @@ name = "regex-syntax"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
+
+[[package]]
+name = "rlimit"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7043b63bd0cd1aaa628e476b80e6d4023a3b50eb32789f2728908107bd0c793a"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "rustc-demangle"
@@ -2663,18 +2672,19 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "scx_bpf_compat"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "libbpf-rs",
  "log",
  "once_cell",
+ "scx_cargo",
  "scx_utils",
 ]
 
 [[package]]
 name = "scx_bpf_unittests"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "cc",
  "indoc",
@@ -2684,7 +2694,7 @@ dependencies = [
 
 [[package]]
 name = "scx_bpfland"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "clap",
@@ -2692,6 +2702,7 @@ dependencies = [
  "ctrlc",
  "libbpf-rs",
  "log",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2700,8 +2711,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "scx_cargo"
+version = "1.0.21"
+dependencies = [
+ "scx_utils",
+]
+
+[[package]]
 name = "scx_chaos"
-version = "1.0.18"
+version = "1.0.19"
 dependencies = [
  "anyhow",
  "clap",
@@ -2710,7 +2728,8 @@ dependencies = [
  "libbpf-rs",
  "libc",
  "log",
- "nix 0.29.0",
+ "nix 0.30.1",
+ "scx_cargo",
  "scx_p2dq",
  "scx_stats",
  "scx_stats_derive",
@@ -2722,7 +2741,7 @@ dependencies = [
 
 [[package]]
 name = "scx_cosmos"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "anyhow",
  "clap",
@@ -2730,6 +2749,7 @@ dependencies = [
  "ctrlc",
  "libbpf-rs",
  "log",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2739,7 +2759,7 @@ dependencies = [
 
 [[package]]
 name = "scx_flash"
-version = "1.0.13"
+version = "1.0.14"
 dependencies = [
  "anyhow",
  "clap",
@@ -2747,6 +2767,7 @@ dependencies = [
  "ctrlc",
  "libbpf-rs",
  "log",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2756,7 +2777,7 @@ dependencies = [
 
 [[package]]
 name = "scx_lavd"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -2765,15 +2786,17 @@ dependencies = [
  "combinations",
  "crossbeam",
  "ctrlc",
- "fb_procfs",
  "gpoint",
  "hex",
  "itertools 0.13.0",
  "libbpf-rs",
  "libc",
  "log",
+ "nix 0.30.1",
  "ordered-float",
  "plain",
+ "rlimit",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2784,7 +2807,7 @@ dependencies = [
 
 [[package]]
 name = "scx_layered"
-version = "1.0.16"
+version = "1.0.18"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -2798,42 +2821,45 @@ dependencies = [
  "libbpf-rs",
  "libc",
  "log",
- "nix 0.29.0",
+ "nix 0.30.1",
  "nvml-wrapper",
  "once_cell",
+ "regex",
  "scx_bpf_compat",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
  "serde",
  "serde_json",
  "simplelog",
- "sysinfo 0.33.1",
+ "sysinfo",
  "walkdir",
 ]
 
 [[package]]
 name = "scx_lib_selftests"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
  "anyhow",
  "libbpf-rs",
+ "scx_cargo",
  "scx_utils",
  "simplelog",
 ]
 
 [[package]]
 name = "scx_loader"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "clap",
  "colored 3.0.0",
  "ctrlc",
  "log",
- "nix 0.29.0",
+ "nix 0.30.1",
  "serde",
- "sysinfo 0.33.1",
+ "sysinfo",
  "tokio",
  "tokio-util",
  "toml",
@@ -2843,7 +2869,7 @@ dependencies = [
 
 [[package]]
 name = "scx_mitosis"
-version = "0.0.12"
+version = "0.0.13"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -2851,13 +2877,13 @@ dependencies = [
  "clap",
  "crossbeam",
  "ctrlc",
- "fb_procfs",
  "itertools 0.13.0",
  "lazy_static",
  "libbpf-rs",
  "libc",
  "log",
  "maplit",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2868,19 +2894,19 @@ dependencies = [
 
 [[package]]
 name = "scx_p2dq"
-version = "1.0.20"
+version = "1.0.21"
 dependencies = [
  "anyhow",
  "chrono",
  "clap",
  "crossbeam",
  "ctrlc",
- "fb_procfs",
  "lazy_static",
  "libbpf-rs",
  "libc",
  "log",
  "ordered-float",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2892,7 +2918,7 @@ dependencies = [
 
 [[package]]
 name = "scx_rlfifo"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "ctrlc",
@@ -2900,13 +2926,14 @@ dependencies = [
  "libc",
  "plain",
  "procfs 0.17.0",
+ "scx_cargo",
  "scx_rustland_core",
  "scx_utils",
 ]
 
 [[package]]
 name = "scx_rustland"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "clap",
@@ -2917,6 +2944,7 @@ dependencies = [
  "ordered-float",
  "plain",
  "procfs 0.17.0",
+ "scx_cargo",
  "scx_rustland_core",
  "scx_stats",
  "scx_stats_derive",
@@ -2927,7 +2955,7 @@ dependencies = [
 
 [[package]]
 name = "scx_rustland_core"
-version = "2.3.4"
+version = "2.3.6"
 dependencies = [
  "anyhow",
  "libbpf-rs",
@@ -2939,7 +2967,7 @@ dependencies = [
 
 [[package]]
 name = "scx_rusty"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2951,6 +2979,7 @@ dependencies = [
  "libc",
  "log",
  "ordered-float",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -2962,7 +2991,7 @@ dependencies = [
 
 [[package]]
 name = "scx_stats"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "crossbeam",
@@ -2979,7 +3008,7 @@ dependencies = [
 
 [[package]]
 name = "scx_stats_derive"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2990,7 +3019,7 @@ dependencies = [
 
 [[package]]
 name = "scx_tickless"
-version = "1.0.6"
+version = "1.0.7"
 dependencies = [
  "affinity",
  "anyhow",
@@ -2999,6 +3028,7 @@ dependencies = [
  "ctrlc",
  "libbpf-rs",
  "log",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -3008,30 +3038,32 @@ dependencies = [
 
 [[package]]
 name = "scx_userspace_arena"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "buddy_system_allocator",
  "libbpf-rs",
+ "scx_cargo",
  "scx_utils",
 ]
 
 [[package]]
 name = "scx_utils"
-version = "1.0.19"
+version = "1.0.21"
 dependencies = [
  "anyhow",
  "bindgen 0.72.0",
  "bitvec",
+ "clap",
  "const_format",
  "glob",
  "hex",
  "lazy_static",
  "libbpf-cargo",
  "libbpf-rs",
- "libbpf-sys",
  "libc",
  "log",
+ "nix 0.30.1",
  "num",
  "nvml-wrapper",
  "nvml-wrapper-sys",
@@ -3052,7 +3084,7 @@ dependencies = [
 
 [[package]]
 name = "scx_wd40"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "anyhow",
  "chrono",
@@ -3062,8 +3094,9 @@ dependencies = [
  "fb_procfs",
  "libbpf-rs",
  "log",
- "nix 0.29.0",
+ "nix 0.30.1",
  "ordered-float",
+ "scx_cargo",
  "scx_stats",
  "scx_stats_derive",
  "scx_utils",
@@ -3074,8 +3107,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "scxcash"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "clap",
+ "ctrlc",
+ "libbpf-rs",
+ "libc",
+ "log",
+ "num_cpus",
+ "scx_cargo",
+ "scx_utils",
+ "serde",
+ "serde_json",
+ "simplelog",
+]
+
+[[package]]
 name = "scxctl"
-version = "1.0.15"
+version = "1.0.16"
 dependencies = [
  "clap",
  "colored 3.0.0",
@@ -3085,7 +3136,7 @@ dependencies = [
 
 [[package]]
 name = "scxtop"
-version = "1.0.17"
+version = "1.0.18"
 dependencies = [
  "anyhow",
  "blazesym",
@@ -3100,7 +3151,7 @@ dependencies = [
  "libc",
  "log",
  "log-panics",
- "nix 0.29.0",
+ "nix 0.30.1",
  "num-format",
  "perfetto_protos",
  "plain",
@@ -3109,6 +3160,7 @@ dependencies = [
  "rand",
  "ratatui",
  "regex",
+ "scx_cargo",
  "scx_stats",
  "scx_utils",
  "serde",
@@ -3116,7 +3168,7 @@ dependencies = [
  "signal-hook",
  "simplelog",
  "smartstring",
- "sysinfo 0.35.2",
+ "sysinfo",
  "tempfile",
  "tokio",
  "tokio-util",
@@ -3281,9 +3333,9 @@ dependencies = [
 
 [[package]]
 name = "slab"
-version = "0.4.10"
+version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04dc19736151f35336d325007ac991178d504a119863a2fcb3758cdb5e52c50d"
+checksum = "7a2ae44ef20feb57a68b23d846850f861394c2e02dc425a50098ae8c90267589"
 
 [[package]]
 name = "slog"
@@ -3438,20 +3490,6 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.33.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fc858248ea01b66f19d8e8a6d55f41deaf91e9d495246fd01368d99935c6c01"
-dependencies = [
- "core-foundation-sys",
- "libc",
- "memchr",
- "ntapi",
- "rayon",
- "windows 0.57.0",
-]
-
-[[package]]
-name = "sysinfo"
 version = "0.35.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c3ffa3e4ff2b324a57f7aeb3c349656c7b127c3c189520251a648102a92496e"
@@ -3461,7 +3499,7 @@ dependencies = [
  "ntapi",
  "objc2-core-foundation",
  "objc2-io-kit",
- "windows 0.61.3",
+ "windows",
 ]
 
 [[package]]
@@ -3877,7 +3915,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vmlinux_docify"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "clap",
  "walkdir",
@@ -4037,22 +4075,12 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "windows"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12342cb4d8e3b046f3d80effd474a7a02447231330ef77d71daa6fbc40681143"
-dependencies = [
- "windows-core 0.57.0",
- "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "windows"
 version = "0.61.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9babd3a767a4c1aef6900409f85f5d53ce2544ccdfaa86dad48c91782c6d6893"
 dependencies = [
  "windows-collections",
- "windows-core 0.61.2",
+ "windows-core",
  "windows-future",
  "windows-link",
  "windows-numerics",
@@ -4064,19 +4092,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3beeceb5e5cfd9eb1d76b381630e82c4241ccd0d27f1a39ed41b2760b255c5e8"
 dependencies = [
- "windows-core 0.61.2",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2ed2439a290666cd67ecce2b0ffaad89c2a56b976b736e6ece670297897832d"
-dependencies = [
- "windows-implement 0.57.0",
- "windows-interface 0.57.0",
- "windows-result 0.1.2",
- "windows-targets 0.52.6",
+ "windows-core",
 ]
 
 [[package]]
@@ -4085,10 +4101,10 @@ version = "0.61.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0fdd3ddb90610c7638aa2b3a3ab2904fb9e5cdbecc643ddb3647212781c4ae3"
 dependencies = [
- "windows-implement 0.60.0",
- "windows-interface 0.59.1",
+ "windows-implement",
+ "windows-interface",
  "windows-link",
- "windows-result 0.3.4",
+ "windows-result",
  "windows-strings",
 ]
 
@@ -4098,20 +4114,9 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc6a41e98427b19fe4b73c550f060b59fa592d7d686537eebf9385621bfbad8e"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
  "windows-link",
  "windows-threading",
-]
-
-[[package]]
-name = "windows-implement"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9107ddc059d5b6fbfbffdfa7a7fe3e22a226def0b2608f72e9d552763d3e1ad7"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.104",
 ]
 
 [[package]]
@@ -4119,17 +4124,6 @@ name = "windows-implement"
 version = "0.60.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a47fddd13af08290e67f4acabf4b459f647552718f683a7b415d290ac744a836"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.104",
-]
-
-[[package]]
-name = "windows-interface"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29bee4b38ea3cde66011baa44dba677c432a78593e202392d1e9070cf2a7fca7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4159,17 +4153,8 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9150af68066c4c5c07ddc0ce30421554771e528bde427614c61038bc2c92c2b1"
 dependencies = [
- "windows-core 0.61.2",
+ "windows-core",
  "windows-link",
-]
-
-[[package]]
-name = "windows-result"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e383302e8ec8515204254685643de10811af0ed97ea37210dc26fb0032647f8"
-dependencies = [
- "windows-targets 0.52.6",
 ]
 
 [[package]]
