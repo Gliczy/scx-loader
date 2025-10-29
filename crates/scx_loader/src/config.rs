@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Copyright (c) 2024 Vladislav Nepogodin <vnepogodin@cachyos.org>
+// Copyright (c) 2024-2025 Vladislav Nepogodin <vnepogodin@cachyos.org>
 
 // This software may be used and distributed according to the terms of the
 // GNU General Public License version 2.
@@ -48,10 +48,15 @@ pub fn parse_config_file(filepath: &str) -> Result<Config> {
 }
 
 pub fn get_config_path() -> Result<String> {
+    let vendordir = option_env!("MESON_VENDORDIR").unwrap_or("/usr/share");
     // Search in system directories
     let check_paths = [
+        // locations for user config
         "/etc/scx_loader/config.toml".to_owned(),
         "/etc/scx_loader.toml".to_owned(),
+        // locations for distributions to ship default configuration
+        format!("{vendordir}/scx_loader/config.toml").to_owned(),
+        format!("{vendordir}/scx_loader.toml").to_owned(),
     ];
     for check_path in check_paths {
         if !Path::new(&check_path).exists() {
@@ -81,6 +86,7 @@ pub fn get_default_config() -> Config {
         SupportedSched::P2DQ,
         SupportedSched::Tickless,
         SupportedSched::Rustland,
+        SupportedSched::Cosmos,
     ];
     let scheds_map = HashMap::from(supported_scheds.map(|x| init_default_config_entry(x)));
     Config {
@@ -221,6 +227,8 @@ fn get_default_scx_flags_for_mode(scx_sched: &SupportedSched, sched_mode: SchedM
         },
         // scx_rustland doesn't support any of these modes
         SupportedSched::Rustland => vec![],
+        // scx_cosmos doesn't support any of these modes
+        SupportedSched::Cosmos => vec![],
     }
 }
 
@@ -285,6 +293,13 @@ powersave_mode = ["-f", "50", "-p"]
 server_mode = ["-f", "100"]
 
 [scheds.scx_rustland]
+auto_mode = []
+gaming_mode = []
+lowlatency_mode = []
+powersave_mode = []
+server_mode = []
+
+[scheds.scx_cosmos]
 auto_mode = []
 gaming_mode = []
 lowlatency_mode = []
