@@ -29,7 +29,7 @@ use zbus::Connection;
 
 #[derive(Debug, PartialEq)]
 enum ScxMessage {
-    /// Quit the scx_loader
+    /// Quit the `scx_loader`
     Quit,
     /// Stop the scheduler, if any
     StopSched,
@@ -276,7 +276,7 @@ async fn monitor_cpu_util() -> Result<()> {
                         .wait()
                         .await
                         .expect("Failed to wait on scx_lavd");
-                    log::info!("scx_lavd exited with status: {}", lavd_exit_status);
+                    log::info!("scx_lavd exited with status: {lavd_exit_status}");
                 }
             }
         }
@@ -538,7 +538,7 @@ async fn start_scheduler(
                         log::debug!("Child process exited with status: {status:?}");
                     }
 
-                    _ = cancel_token.cancelled() => {
+                    () = cancel_token.cancelled() => {
                         log::debug!("Received cancellation signal");
                         // Send SIGINT
                         if let Some(child_id) = child.id() {
@@ -564,9 +564,7 @@ async fn start_scheduler(
 
             retries += 1;
             log::error!(
-                "Failed to start scheduler (attempt {}/{})",
-                retries,
-                max_retries,
+                "Failed to start scheduler (attempt {retries}/{max_retries})",
             );
         }
 
@@ -605,7 +603,7 @@ async fn stop_scheduler(
         log::debug!("Stopping already running scheduler..");
         cancel_token.cancel();
         let status = task.await;
-        log::debug!("Scheduler was stopped with status: {:?}", status);
+        log::debug!("Scheduler was stopped with status: {status:?}");
         // Create a new cancellation token
         *cancel_token = Arc::new(tokio_util::sync::CancellationToken::new());
     }

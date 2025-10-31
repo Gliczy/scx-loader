@@ -10,21 +10,18 @@ use zbus::blocking::Connection;
 fn cmd_get(scx_loader: LoaderClientProxyBlocking) -> Result<(), Box<dyn std::error::Error>> {
     let current_scheduler: String = scx_loader.current_scheduler()?;
 
-    match current_scheduler.as_str() {
-        "unknown" => println!("no scx scheduler running"),
-        _ => {
-            let sched = SupportedSched::try_from(current_scheduler.as_str())?;
-            let current_args: Vec<String> = scx_loader.current_scheduler_args()?;
+    if current_scheduler.as_str() == "unknown" { println!("no scx scheduler running") } else {
+        let sched = SupportedSched::try_from(current_scheduler.as_str())?;
+        let current_args: Vec<String> = scx_loader.current_scheduler_args()?;
 
-            if current_args.is_empty() {
-                let sched_mode: SchedMode = scx_loader.scheduler_mode()?;
-                println!("running {sched:?} in {sched_mode:?} mode");
-            } else {
-                println!(
-                    "running {sched:?} with arguments \"{}\"",
-                    current_args.join(" ")
-                );
-            }
+        if current_args.is_empty() {
+            let sched_mode: SchedMode = scx_loader.scheduler_mode()?;
+            println!("running {sched:?} in {sched_mode:?} mode");
+        } else {
+            println!(
+                "running {sched:?} with arguments \"{}\"",
+                current_args.join(" ")
+            );
         }
     }
     Ok(())
@@ -37,14 +34,14 @@ fn cmd_list(scx_loader: LoaderClientProxyBlocking) -> Result<(), Box<dyn std::er
                 .iter()
                 .map(|s| remove_scx_prefix(&s.to_string()))
                 .collect::<Vec<String>>();
-            println!("supported schedulers: {:?}", supported_scheds);
-            return Ok(());
+            println!("supported schedulers: {supported_scheds:?}");
+            Ok(())
         }
         Err(e) => {
             eprintln!("scheduler list failed: {e}");
             exit(1);
         }
-    };
+    }
 }
 
 fn cmd_start(
@@ -67,15 +64,12 @@ fn cmd_start(
 
     let sched: SupportedSched = validate_sched(scx_loader.clone(), sched_name);
     let mode: SchedMode = mode_name.unwrap_or(SchedMode::Auto);
-    match args {
-        Some(args) => {
-            scx_loader.start_scheduler_with_args(sched.clone(), &args.clone())?;
-            println!("started {sched:?} with arguments \"{}\"", args.join(" "));
-        }
-        None => {
-            scx_loader.start_scheduler(sched.clone(), mode.clone())?;
-            println!("started {sched:?} in {mode:?} mode");
-        }
+    if let Some(args) = args {
+        scx_loader.start_scheduler_with_args(sched.clone(), &args.clone())?;
+        println!("started {sched:?} with arguments \"{}\"", args.join(" "));
+    } else {
+        scx_loader.start_scheduler(sched.clone(), mode.clone())?;
+        println!("started {sched:?} in {mode:?} mode");
     }
     Ok(())
 }
@@ -106,18 +100,15 @@ fn cmd_switch(
         Some(mode_name) => mode_name,
         None => scx_loader.scheduler_mode().unwrap(),
     };
-    match args {
-        Some(args) => {
-            scx_loader.switch_scheduler_with_args(sched.clone(), &args.clone())?;
-            println!(
-                "switched to {sched:?} with arguments \"{}\"",
-                args.join(" ")
-            );
-        }
-        None => {
-            scx_loader.switch_scheduler(sched.clone(), mode.clone())?;
-            println!("switched to {sched:?} in {mode:?} mode");
-        }
+    if let Some(args) = args {
+        scx_loader.switch_scheduler_with_args(sched.clone(), &args.clone())?;
+        println!(
+            "switched to {sched:?} with arguments \"{}\"",
+            args.join(" ")
+        );
+    } else {
+        scx_loader.switch_scheduler(sched.clone(), mode.clone())?;
+        println!("switched to {sched:?} in {mode:?} mode");
     }
     Ok(())
 }
@@ -159,7 +150,7 @@ const SCHED_PREFIX: &str = "scx_";
 
 fn ensure_scx_prefix(input: String) -> String {
     if !input.starts_with(SCHED_PREFIX) {
-        return format!("{}{}", SCHED_PREFIX, input);
+        return format!("{SCHED_PREFIX}{input}");
     }
     input
 }
@@ -175,7 +166,7 @@ fn validate_sched(scx_loader: LoaderClientProxyBlocking, sched: String) -> Suppo
     let raw_supported_scheds: Vec<String> = scx_loader.supported_schedulers().unwrap();
     let supported_scheds: Vec<String> = raw_supported_scheds
         .iter()
-        .map(|s| remove_scx_prefix(s))
+        .map(remove_scx_prefix)
         .collect();
     if !supported_scheds.contains(&sched) && !raw_supported_scheds.contains(&sched) {
         println!(
@@ -184,7 +175,7 @@ fn validate_sched(scx_loader: LoaderClientProxyBlocking, sched: String) -> Suppo
             &sched.yellow(),
             "--sched <SCHED>".bold()
         );
-        println!("supported schedulers: {:?}", supported_scheds);
+        println!("supported schedulers: {supported_scheds:?}");
         println!("\nFor more information, try '{}'", "--help".bold());
         exit(1);
     }

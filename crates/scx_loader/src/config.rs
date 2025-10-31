@@ -89,7 +89,7 @@ pub fn get_default_config() -> Config {
         SupportedSched::Cosmos,
         SupportedSched::Beerland,
     ];
-    let scheds_map = HashMap::from(supported_scheds.map(|x| init_default_config_entry(x)));
+    let scheds_map = HashMap::from(supported_scheds.map(init_default_config_entry));
     Config {
         default_sched: None,
         default_mode: Some(SchedMode::Auto),
@@ -345,7 +345,7 @@ default_mode = "Auto"
         assert_eq!(
             bpfland_flags
                 .iter()
-                .map(|x| x.as_str())
+                .map(std::string::String::as_str)
                 .collect::<Vec<&str>>(),
             expected_flags
         );
@@ -367,14 +367,14 @@ auto_mode = ["--help"]
         let expected_flags =
             get_default_scx_flags_for_mode(&SupportedSched::Lavd, SchedMode::Gaming);
         assert_eq!(
-            lavd_flags.iter().map(|x| x.as_str()).collect::<Vec<&str>>(),
+            lavd_flags.iter().map(std::string::String::as_str).collect::<Vec<&str>>(),
             expected_flags
         );
 
         let lavd_flags =
             get_scx_flags_for_mode(&parsed_config, &SupportedSched::Lavd, SchedMode::Auto);
         assert_eq!(
-            lavd_flags.iter().map(|x| x.as_str()).collect::<Vec<&str>>(),
+            lavd_flags.iter().map(std::string::String::as_str).collect::<Vec<&str>>(),
             vec!["--help"]
         );
     }
