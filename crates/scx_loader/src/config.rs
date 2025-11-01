@@ -105,7 +105,7 @@ pub fn get_scx_flags_for_mode(
 ) -> Vec<String> {
     let scx_name: &str = scx_sched.clone().into();
     if let Some(sched_config) = config.scheds.get(scx_name) {
-        let scx_flags = extract_scx_flags_from_config(sched_config, &sched_mode);
+        let scx_flags = extract_scx_flags_from_config(sched_config, sched_mode);
 
         // try to exact flags from config, otherwise fallback to hardcoded default
         scx_flags.unwrap_or({
@@ -125,9 +125,9 @@ pub fn get_scx_flags_for_mode(
 /// Extract the scx flags from config
 fn extract_scx_flags_from_config(
     sched_config: &Sched,
-    sched_mode: &SchedMode,
+    sched_mode: SchedMode,
 ) -> Option<Vec<String>> {
-    match sched_mode {
+    match &sched_mode {
         SchedMode::Gaming => sched_config.gaming_mode.clone(),
         SchedMode::LowLatency => sched_config.lowlatency_mode.clone(),
         SchedMode::PowerSave => sched_config.powersave_mode.clone(),
@@ -173,10 +173,12 @@ fn get_default_sched_for_config(scx_sched: &SupportedSched) -> Sched {
 }
 
 /// Get the default scx flags for the given sched mode
-fn get_default_scx_flags_for_mode(scx_sched: &SupportedSched, sched_mode: SchedMode) -> Vec<&str> {
-    match scx_sched {
+fn get_default_scx_flags_for_mode(
+    scx_sched: &SupportedSched,
+    sched_mode: SchedMode,
+) -> Vec<&'static str> {
+    match &scx_sched {
         SupportedSched::Bpfland => match sched_mode {
-            SchedMode::Gaming => vec![],
             SchedMode::LowLatency => {
                 vec!["-m", "performance", "-w"]
             }
@@ -184,7 +186,7 @@ fn get_default_scx_flags_for_mode(scx_sched: &SupportedSched, sched_mode: SchedM
                 vec!["-s", "20000", "-m", "powersave", "-I", "100", "-t", "100"]
             }
             SchedMode::Server => vec!["-s", "20000", "-S"],
-            SchedMode::Auto => vec![],
+            SchedMode::Gaming | SchedMode::Auto => vec![],
         },
         SupportedSched::Lavd => match sched_mode {
             SchedMode::Gaming | SchedMode::LowLatency => vec!["--performance"],
@@ -192,8 +194,6 @@ fn get_default_scx_flags_for_mode(scx_sched: &SupportedSched, sched_mode: SchedM
             // NOTE: potentially adding --auto in future
             SchedMode::Server | SchedMode::Auto => vec![],
         },
-        // scx_rusty doesn't support any of these modes
-        SupportedSched::Rusty => vec![],
         SupportedSched::Flash => match sched_mode {
             SchedMode::Gaming => vec!["-m", "all"],
             SchedMode::LowLatency => vec!["-m", "performance", "-w", "-C", "0"],
@@ -228,8 +228,6 @@ fn get_default_scx_flags_for_mode(scx_sched: &SupportedSched, sched_mode: SchedM
             SchedMode::Server => vec!["-f", "100"],
             SchedMode::Auto => vec![],
         },
-        // scx_rustland doesn't support any of these modes
-        SupportedSched::Rustland => vec![],
         SupportedSched::Cosmos => match sched_mode {
             SchedMode::Gaming => vec!["-c", "0", "-p", "0"],
             SchedMode::LowLatency => vec!["-m", "performance", "-c", "0", "-p", "0", "-w"],
@@ -237,8 +235,8 @@ fn get_default_scx_flags_for_mode(scx_sched: &SupportedSched, sched_mode: SchedM
             SchedMode::Server => vec!["-a", "-s", "20000"],
             SchedMode::Auto => vec!["-d"],
         },
-        // scx_beerland doesn't support any of these modes
-        SupportedSched::Beerland => vec![],
+        // scx_rusty, scx_rustland, scx_beerland doesn't support any of these modes
+        SupportedSched::Rusty | SupportedSched::Rustland | SupportedSched::Beerland => vec![],
     }
 }
 
@@ -367,14 +365,20 @@ auto_mode = ["--help"]
         let expected_flags =
             get_default_scx_flags_for_mode(&SupportedSched::Lavd, SchedMode::Gaming);
         assert_eq!(
-            lavd_flags.iter().map(std::string::String::as_str).collect::<Vec<&str>>(),
+            lavd_flags
+                .iter()
+                .map(std::string::String::as_str)
+                .collect::<Vec<&str>>(),
             expected_flags
         );
 
         let lavd_flags =
             get_scx_flags_for_mode(&parsed_config, &SupportedSched::Lavd, SchedMode::Auto);
         assert_eq!(
-            lavd_flags.iter().map(std::string::String::as_str).collect::<Vec<&str>>(),
+            lavd_flags
+                .iter()
+                .map(std::string::String::as_str)
+                .collect::<Vec<&str>>(),
             vec!["--help"]
         );
     }

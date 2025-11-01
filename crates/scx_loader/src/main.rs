@@ -75,7 +75,7 @@ struct Args {
 impl ScxLoader {
     /// Get currently running scheduler, in case non is running return "unknown"
     #[zbus(property)]
-    async fn current_scheduler(&self) -> String {
+    fn current_scheduler(&self) -> String {
         if let Some(current_scx) = &self.current_scx {
             let current_scx: &str = current_scx.clone().into();
             log::info!("called {current_scx:?}");
@@ -86,19 +86,19 @@ impl ScxLoader {
 
     /// Get scheduler mode
     #[zbus(property)]
-    async fn scheduler_mode(&self) -> SchedMode {
-        self.current_mode.clone()
+    fn scheduler_mode(&self) -> SchedMode {
+        self.current_mode
     }
 
     /// Get arguments used for currently running scheduler
     #[zbus(property)]
-    async fn current_scheduler_args(&self) -> Vec<String> {
+    fn current_scheduler_args(&self) -> Vec<String> {
         self.current_args.clone().unwrap_or_default()
     }
 
     /// Get list of supported schedulers
     #[zbus(property)]
-    async fn supported_schedulers(&self) -> Vec<&str> {
+    fn supported_schedulers(&self) -> Vec<&'static str> {
         vec![
             "scx_beerland",
             "scx_bpfland",
@@ -111,29 +111,18 @@ impl ScxLoader {
             "scx_rusty",
         ]
     }
-    async fn start_scheduler(
-        &mut self,
-        scx_name: SupportedSched,
-        sched_mode: SchedMode,
-    ) -> zbus::fdo::Result<()> {
+    fn start_scheduler(&mut self, scx_name: SupportedSched, sched_mode: SchedMode) {
         log::info!("starting {scx_name:?} with mode {sched_mode:?}..");
 
-        let _ = self.channel.send(ScxMessage::StartSched((
-            scx_name.clone(),
-            sched_mode.clone(),
-        )));
+        let _ = self
+            .channel
+            .send(ScxMessage::StartSched((scx_name.clone(), sched_mode)));
         self.current_scx = Some(scx_name);
         self.current_mode = sched_mode;
         self.current_args = None;
-
-        Ok(())
     }
 
-    async fn start_scheduler_with_args(
-        &mut self,
-        scx_name: SupportedSched,
-        scx_args: Vec<String>,
-    ) -> zbus::fdo::Result<()> {
+    fn start_scheduler_with_args(&mut self, scx_name: SupportedSched, scx_args: Vec<String>) {
         log::info!("starting {scx_name:?} with args {scx_args:?}..");
 
         let _ = self.channel.send(ScxMessage::StartSchedArgs((
@@ -144,33 +133,20 @@ impl ScxLoader {
         // reset mode to auto
         self.current_mode = SchedMode::Auto;
         self.current_args = Some(scx_args);
-
-        Ok(())
     }
 
-    async fn switch_scheduler(
-        &mut self,
-        scx_name: SupportedSched,
-        sched_mode: SchedMode,
-    ) -> zbus::fdo::Result<()> {
+    fn switch_scheduler(&mut self, scx_name: SupportedSched, sched_mode: SchedMode) {
         log::info!("switching {scx_name:?} with mode {sched_mode:?}..");
 
-        let _ = self.channel.send(ScxMessage::SwitchSched((
-            scx_name.clone(),
-            sched_mode.clone(),
-        )));
+        let _ = self
+            .channel
+            .send(ScxMessage::SwitchSched((scx_name.clone(), sched_mode)));
         self.current_scx = Some(scx_name);
         self.current_mode = sched_mode;
         self.current_args = None;
-
-        Ok(())
     }
 
-    async fn switch_scheduler_with_args(
-        &mut self,
-        scx_name: SupportedSched,
-        scx_args: Vec<String>,
-    ) -> zbus::fdo::Result<()> {
+    fn switch_scheduler_with_args(&mut self, scx_name: SupportedSched, scx_args: Vec<String>) {
         log::info!("switching {scx_name:?} with args {scx_args:?}..");
 
         let _ = self.channel.send(ScxMessage::SwitchSchedArgs((
@@ -181,11 +157,9 @@ impl ScxLoader {
         // reset mode to auto
         self.current_mode = SchedMode::Auto;
         self.current_args = Some(scx_args);
-
-        Ok(())
     }
 
-    async fn stop_scheduler(&mut self) -> zbus::fdo::Result<()> {
+    fn stop_scheduler(&mut self) {
         if let Some(current_scx) = &self.current_scx {
             let scx_name: &str = current_scx.clone().into();
 
@@ -194,11 +168,9 @@ impl ScxLoader {
             self.current_scx = None;
             self.current_args = None;
         }
-
-        Ok(())
     }
 
-    async fn restart_scheduler(&mut self) -> zbus::fdo::Result<()> {
+    fn restart_scheduler(&mut self) -> zbus::fdo::Result<()> {
         if let Some(current_scx) = &self.current_scx {
             let scx_name: &str = current_scx.clone().into();
 
@@ -206,7 +178,7 @@ impl ScxLoader {
             let _ = self.channel.send(ScxMessage::RestartSched((
                 current_scx.clone(),
                 self.current_args.clone(),
-                self.current_mode.clone(),
+                self.current_mode,
             )));
 
             Ok(())
@@ -336,7 +308,7 @@ async fn main() -> Result<()> {
     if let Some(default_sched) = &config.default_sched {
         log::info!("Starting default scheduler: {default_sched:?}");
 
-        let default_mode = config.default_mode.clone().unwrap_or(SchedMode::Auto);
+        let default_mode = config.default_mode.unwrap_or(SchedMode::Auto);
 
         let loader_client = LoaderClientProxy::new(&connection).await?;
         loader_client
@@ -568,9 +540,7 @@ fn spawn_scheduler(scx_crate: SupportedSched, args: Vec<String>) -> Result<Child
     cmd.stdin(Stdio::null());
 
     // spawn process
-    let child = cmd.spawn().expect("failed to spawn command");
-
-    Ok(child)
+    Ok(cmd.spawn()?)
 }
 
 async fn stop_scheduler(
