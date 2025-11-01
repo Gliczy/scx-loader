@@ -506,7 +506,7 @@ fn start_scheduler(
         let mut last_status: Option<ExitStatus> = None;
 
         while retries < max_retries {
-            let child = spawn_scheduler(scx_crate.clone(), args.clone()).await;
+            let child = spawn_scheduler(scx_crate.clone(), args.clone());
 
             let mut failed = false;
             if let Ok(mut child) = child {
@@ -554,7 +554,7 @@ fn start_scheduler(
 
 /// Starts the scheduler as a child process and returns child object to manage lifecycle by the
 /// caller.
-async fn spawn_scheduler(scx_crate: SupportedSched, args: Vec<String>) -> Result<Child> {
+fn spawn_scheduler(scx_crate: SupportedSched, args: Vec<String>) -> Result<Child> {
     let sched_bin_name: &str = scx_crate.into();
     log::info!("starting {sched_bin_name} command");
 
