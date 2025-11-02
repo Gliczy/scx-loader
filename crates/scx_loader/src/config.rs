@@ -66,7 +66,7 @@ pub fn parse_config_file(filepath: &str) -> Result<Config> {
 /// This function will return an error if no config file is found in any of the
 /// predefined locations.
 pub fn get_config_path() -> Result<String> {
-    let vendordir = option_env!("MESON_VENDORDIR").unwrap_or("/usr/share");
+    let vendordir = option_env!("VENDORDIR").unwrap_or("/usr/share");
     // Search in system directories
     let check_paths = [
         // locations for user config
