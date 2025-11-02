@@ -34,6 +34,10 @@ pub struct Sched {
 }
 
 /// Initialize config from first found config path, overwise fallback to default config
+///
+/// # Errors
+///
+/// This function will return an error if a config file is found but fails to be parsed.
 pub fn init_config() -> Result<Config> {
     if let Ok(config_path) = get_config_path() {
         parse_config_file(&config_path)
@@ -42,11 +46,25 @@ pub fn init_config() -> Result<Config> {
     }
 }
 
+/// Parses the config file at the given path.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - The file cannot be read (e.g., permissions, not found).
+/// - The file content is empty.
+/// - The file content is not valid TOML.
 pub fn parse_config_file(filepath: &str) -> Result<Config> {
     let file_content = fs::read_to_string(filepath)?;
     parse_config_content(&file_content)
 }
 
+/// Searches for and returns the path to the configuration file.
+///
+/// # Errors
+///
+/// This function will return an error if no config file is found in any of the
+/// predefined locations.
 pub fn get_config_path() -> Result<String> {
     let vendordir = option_env!("MESON_VENDORDIR").unwrap_or("/usr/share");
     // Search in system directories
