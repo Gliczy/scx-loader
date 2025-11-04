@@ -82,7 +82,7 @@ impl From<SupportedSched> for &str {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, Type, Value, OwnedValue, PartialEq)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize, Type, Value, OwnedValue, PartialEq)]
 pub enum SchedMode {
     /// Default values for the scheduler
     Auto = 0,
