@@ -205,13 +205,13 @@ fn get_default_scx_flags_for_mode(
                 vec!["-s", "20000", "-m", "powersave", "-I", "100", "-t", "100"]
             }
             SchedMode::Server => vec!["-s", "20000", "-S"],
-            SchedMode::Gaming | SchedMode::Auto => vec![],
+            SchedMode::Gaming => vec!["-m", "all"],
+            SchedMode::Auto => vec!["-m", "auto"],
         },
         SupportedSched::Lavd => match sched_mode {
             SchedMode::Gaming | SchedMode::LowLatency => vec!["--performance"],
             SchedMode::PowerSave => vec!["--powersave"],
-            // NOTE: potentially adding --auto in future
-            SchedMode::Server | SchedMode::Auto => vec![],
+            SchedMode::Server | SchedMode::Auto => vec!["--autopilot"],
         },
         SupportedSched::Flash => match sched_mode {
             SchedMode::Gaming => vec!["-m", "all"],
@@ -231,14 +231,14 @@ fn get_default_scx_flags_for_mode(
             SchedMode::Server => vec![
                 "-m", "all", "-s", "20000", "-S", "1000", "-I", "-1", "-D", "-L",
             ],
-            SchedMode::Auto => vec![],
+            SchedMode::Auto => vec!["-m", "auto"],
         },
         SupportedSched::P2DQ => match sched_mode {
             SchedMode::Gaming => vec!["--task-slice", "true", "-f", "--sched-mode", "performance"],
             SchedMode::LowLatency => vec!["-y", "-f", "--task-slice", "true"],
             SchedMode::PowerSave => vec!["--sched-mode", "efficiency"],
             SchedMode::Server => vec!["--keep-running"],
-            SchedMode::Auto => vec![],
+            SchedMode::Auto => vec!["--sched-mode", "default"],
         },
         SupportedSched::Tickless => match sched_mode {
             SchedMode::Gaming => vec!["-f", "5000", "-s", "5000"],
@@ -281,8 +281,8 @@ mod tests {
 default_mode = "Auto"
 
 [scheds.scx_bpfland]
-auto_mode = []
-gaming_mode = []
+auto_mode = ["-m", "auto"]
+gaming_mode = ["-m", "all"]
 lowlatency_mode = ["-m", "performance", "-w"]
 powersave_mode = ["-s", "20000", "-m", "powersave", "-I", "100", "-t", "100"]
 server_mode = ["-s", "20000", "-S"]
@@ -295,21 +295,21 @@ powersave_mode = []
 server_mode = []
 
 [scheds.scx_lavd]
-auto_mode = []
+auto_mode = ["--autopilot"]
 gaming_mode = ["--performance"]
 lowlatency_mode = ["--performance"]
 powersave_mode = ["--powersave"]
-server_mode = []
+server_mode = ["--autopilot"]
 
 [scheds.scx_flash]
-auto_mode = []
+auto_mode = ["-m", "auto"]
 gaming_mode = ["-m", "all"]
 lowlatency_mode = ["-m", "performance", "-w", "-C", "0"]
 powersave_mode = ["-m", "powersave", "-I", "10000", "-t", "10000", "-s", "10000", "-S", "1000"]
 server_mode = ["-m", "all", "-s", "20000", "-S", "1000", "-I", "-1", "-D", "-L"]
 
 [scheds.scx_p2dq]
-auto_mode = []
+auto_mode = ["--sched-mode", "default"]
 gaming_mode = ["--task-slice", "true", "-f", "--sched-mode", "performance"]
 lowlatency_mode = ["-y", "-f", "--task-slice", "true"]
 powersave_mode = ["--sched-mode", "efficiency"]
